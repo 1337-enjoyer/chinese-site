@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280">
+  <title>Поднебесная — заметки о Китае: язык, культура, практика</title>
+  <meta name="description" content="Сайт-визитка о Китае: китайский язык, культура и деловые практики. Новости, заметки и контакты автора.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Перейти к содержанию</a>
+
+  <header class="site-header" id="top">
+    <div class="wrap header-inner">
+      <a class="brand" href="#top">
+        <span class="brand-mark" aria-hidden="true">中</span>
+        <span class="brand-text">
+          Поднебесная
+          <small>заметки о Китае</small>
+        </span>
+      </a>
+
+      <nav class="nav" aria-label="Основная навигация">
+        <a href="#about">О сайте</a>
+        <a href="#news">Новости</a>
+        <a href="#author">Об авторе</a>
+        <a href="#contacts">Контакты</a>
+        <a class="nav-forum" href="forum.html">Форум <span class="soon">скоро</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ============ БАННЕР ============ -->
+    <section class="hero" aria-label="Баннер">
+      <div class="hero-media" aria-hidden="true">
+        <svg class="hero-art" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#0a1513"/>
+              <stop offset="0.5" stop-color="#123029"/>
+              <stop offset="1" stop-color="#0a1211"/>
+            </linearGradient>
+            <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0" stop-color="#f0d8a4" stop-opacity="0.9"/>
+              <stop offset="0.35" stop-color="#d9b878" stop-opacity="0.35"/>
+              <stop offset="1" stop-color="#c9a25a" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="ridgeFar" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#1b3b34"/>
+              <stop offset="1" stop-color="#122520"/>
+            </linearGradient>
+            <linearGradient id="ridgeMid" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#152e28"/>
+              <stop offset="1" stop-color="#0d1c18"/>
+            </linearGradient>
+            <linearGradient id="ridgeNear" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#0d1a17"/>
+              <stop offset="1" stop-color="#070d0b"/>
+            </linearGradient>
+            <filter id="softMist" x="-30%" y="-60%" width="160%" height="220%">
+              <feGaussianBlur stdDeviation="42"/>
+            </filter>
+            <filter id="softMist2" x="-30%" y="-60%" width="160%" height="220%">
+              <feGaussianBlur stdDeviation="26"/>
+            </filter>
+          </defs>
+
+          <rect width="1600" height="900" fill="url(#sky)"/>
+
+          <!-- солнце -->
+          <circle cx="1130" cy="318" r="260" fill="url(#sunGlow)"/>
+          <circle cx="1130" cy="318" r="88" fill="#e9d3a1" opacity="0.88"/>
+
+          <!-- дальние хребты -->
+          <path d="M0 566 L150 486 L286 532 L432 436 L592 512 L752 448 L920 528 L1086 444 L1258 516 L1432 462 L1600 508 L1600 900 L0 900 Z"
+                fill="url(#ridgeFar)" opacity="0.75"/>
+
+          <!-- туман -->
+          <ellipse cx="520" cy="596" rx="520" ry="56" fill="#9fc7ba" opacity="0.10" filter="url(#softMist)"/>
+          <ellipse cx="1180" cy="640" rx="560" ry="48" fill="#c8dcd4" opacity="0.08" filter="url(#softMist)"/>
+
+          <!-- средние хребты -->
+          <path d="M0 664 L142 588 L302 646 L470 558 L640 630 L818 562 L1006 638 L1198 560 L1396 642 L1600 592 L1600 900 L0 900 Z"
+                fill="url(#ridgeMid)"/>
+
+          <!-- ближние хребты -->
+          <path d="M0 766 L198 692 L382 750 L562 678 L762 754 L962 692 L1162 758 L1382 686 L1600 744 L1600 900 L0 900 Z"
+                fill="url(#ridgeNear)"/>
+
+          <ellipse cx="820" cy="742" rx="700" ry="40" fill="#a8cfc2" opacity="0.07" filter="url(#softMist2)"/>
+
+          <!-- птицы -->
+          <g stroke="#cfe3da" stroke-width="3" fill="none" opacity="0.5" stroke-linecap="round">
+            <path d="M330 236 q14 -12 28 0 q14 -12 28 0"/>
+            <path d="M410 198 q11 -9 22 0 q11 -9 22 0"/>
+            <path d="M372 288 q9 -7 18 0 q9 -7 18 0"/>
+          </g>
+        </svg>
+      </div>
+
+      <div class="wrap hero-inner">
+        <p class="eyebrow">Китай · язык · культура · практика</p>
+        <h1>Понять Китай<br><em>изнутри</em></h1>
+        <p class="hero-lead">
+          Заметки о языке, традициях и деловой повседневности Поднебесной —
+          без стереотипов и глянца. Для тех, кто учит, работает и живёт с Китаем.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#news">Свежие новости</a>
+          <a class="btn btn-ghost" href="#about">О сайте</a>
+        </div>
+
+        <ul class="hero-stats">
+          <li><b>12</b><span>лет с китайским языком</span></li>
+          <li><b>340+</b><span>разобранных иероглифов</span></li>
+          <li><b>7</b><span>провинций Китая</span></li>
+        </ul>
+      </div>
+
+      <div class="hero-scroll" aria-hidden="true">
+        <span>листайте вниз</span>
+        <i></i>
+      </div>
+    </section>
+
+    <!-- ============ О САЙТЕ ============ -->
+    <section class="section" id="about">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="section-num">01</span>
+          <div>
+            <h2>О чём этот сайт</h2>
+            <p class="section-lead">
+              Небольшая авторская витрина: здесь собрано то, что помогает
+              разговаривать с Китаем на одном языке — буквально и переносно.
+            </p>
+          </div>
+        </div>
+
+        <div class="about-grid">
+          <article class="about-card reveal">
+            <span class="about-glyph" aria-hidden="true">语</span>
+            <h3>Язык</h3>
+            <p>
+              Тоны, иероглифика, разговорная практика и подготовка к HSK.
+              Объяснения без академической пыли — на примерах из живой речи.
+            </p>
+            <span class="about-note">HSK 1–6 · разговорный · письмо</span>
+          </article>
+
+          <article class="about-card reveal">
+            <span class="about-glyph" aria-hidden="true">文</span>
+            <h3>Культура</h3>
+            <p>
+              Праздники, чай, каллиграфия и бытовые ритуалы. Почему китайцы
+              делают так, а не иначе — и как это читать без ошибок.
+            </p>
+            <span class="about-note">традиции · современность · повседневность</span>
+          </article>
+
+          <article class="about-card reveal">
+            <span class="about-glyph" aria-hidden="true">商</span>
+            <h3>Практика</h3>
+            <p>
+              Переговоры, WeChat, деловой этикет и логистика. Прикладные
+              заметки для тех, кто работает с китайскими партнёрами.
+            </p>
+            <span class="about-note">бизнес · поездки · коммуникация</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ НОВОСТИ ============ -->
+    <section class="section section-news" id="news">
+      <div class="wrap news-layout">
+        <div class="news-aside">
+          <div class="section-head section-head--stack reveal">
+            <span class="section-num">02</span>
+            <div>
+              <h2>Лента новостей</h2>
+              <p class="section-lead">
+                Короткие заметки и разборы: что происходит в языке,
+                культуре и деловой жизни Китая.
+              </p>
+            </div>
+          </div>
+
+          <p class="scroll-hint reveal">
+            <span class="scroll-hint-icon" aria-hidden="true">↓</span>
+            Лента прокручивается — внутри блока
+          </p>
+
+          <a class="btn btn-ghost btn-small reveal" href="forum.html">Обсудить на форуме</a>
+        </div>
+
+        <div class="news-feed-wrap">
+          <div class="news-feed" tabindex="0" aria-label="Лента новостей, прокручивается">
+            <article class="news-card">
+              <div class="news-meta">
+                <time datetime="2026-11-18">18 ноября 2026</time>
+                <span class="tag">Язык</span>
+              </div>
+              <h3>HSK 4.0: что меняется в экзамене и как готовиться</h3>
+              <p>Разбираю новую структуру уровней, устную часть и типичные ловушки в заданиях на аудирование.</p>
+            </article>
+
+            <article class="news-card">
+              <div class="news-meta">
+                <time datetime="2026-11-12">12 ноября 2026</time>
+                <span class="tag">Культура</span>
+              </div>
+              <h3>Чайная церемония: шесть ошибок новичка</h3>
+              <p>Температура воды, посуда и порядок действий — что действительно важно, а что просто красивый антураж.</p>
+            </article>
+
+            <article class="news-card">
+              <div class="news-meta">
+                <time datetime="2026-11-05">5 ноября 2026</time>
+                <span class="tag">Бизнес</span>
+              </div>
+              <h3>Переговоры с китайскими партнёрами: правила, которых нет в учебниках</h3>
+              <p>Про «лицо», паузы и неофициальную часть встречи — почему решение часто принимается за ужином.</p>
+            </article>
+
+            <article class="news-card">
+              <div class="news-meta">
+                <time datetime="2026-10-28">28 октября 2026</time>
+                <span class="tag">Поездки</span>
+              </div>
+              <h3>Какой город выбрать для первой поездки в Китай</h3>
+              <p>Пекин, Шанхай или Чэнду: сравниваю темп, цены, еду и количество английского на улицах.</p>
+            </article>
+
+            <article class="news-card">
+              <div class="news-meta">
+                <time datetime="2026-10-20">20 октября 2026</time>
+                <span class="tag">Технологии</span>
+              </div>
+              <h3>WeChat Mini Programs: зачем бизнесу мини-приложение</h3>
+              <p>Как устроена экосистема WeChat и почему сайт без мини-программы в Китае часто не работает.</p>
+            </article>
+
+            <article class="news-card">
+              <div class="news-meta">
+                <time datetime="2026-10-11">11 октября 2026</time>
+                <span class="tag">Язык</span>
+              </div>
+              <h3>Тоны: как перестать бояться и начать слышать</h3>
+              <p>Простая система тренировки слуха на три упражнения в день — без репетитора и приложений.</p>
+            </article>
+
+            <article class="news-card">
+              <div class="news-meta">
+                <time datetime="2026-10-02">2 октября 2026</time>
+                <span class="tag">Культура</span>
+              </div>
+              <h3>Праздник середины осени: лунные пряники и семейный круг</h3>
+              <p>Что стоит за праздником, какие подарки уместны и почему дата каждый год меняется.</p>
+            </article>
+
+            <article class="news-card">
+              <div class="news-meta">
+                <time datetime="2026-09-24">24 сентября 2026</time>
+                <span class="tag">Обучение</span>
+              </div>
+              <h3>Слова, которые нельзя перевести одним словом</h3>
+              <p>Подборка понятий вроде 面子 и 关系 — с примерами, которые объясняют больше, чем словарь.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ОБ АВТОРЕ ============ -->
+    <section class="section" id="author">
+      <div class="wrap author-layout">
+        <div class="author-photo reveal" role="img" aria-label="Портрет автора">
+          <span class="author-glyph" aria-hidden="true">李</span>
+          <span class="author-photo-hint">замените на фото</span>
+        </div>
+
+        <div class="author-body reveal">
+          <div class="section-head section-head--stack">
+            <span class="section-num">03</span>
+            <div>
+              <h2>Об авторе</h2>
+            </div>
+          </div>
+
+          <p class="author-lead">
+            Анна Ли — синолог, преподаватель китайского языка и переводчик.
+            Двенадцать лет между Москвой и Поднебесной: учёба, работа,
+            командировки и долгие разговоры на кухнях Чэнду.
+          </p>
+          <p>
+            Веду этот сайт как записную книжку: фиксирую то, что помогает
+            понимать Китай точнее — от тонов в путунхуа до правил делового
+            этикета. Консультирую компании, готовлю к HSK и провожу
+            разговорные клубы.
+          </p>
+
+          <ul class="author-facts">
+            <li><b>Образование</b><span>востоковедение, магистратура</span></li>
+            <li><b>Языки</b><span>китайский, английский, русский</span></li>
+            <li><b>Опыт</b><span>преподавание и перевод с 2014 года</span></li>
+          </ul>
+
+          <div class="author-tags">
+            <span>HSK</span>
+            <span>перевод</span>
+            <span>деловой этикет</span>
+            <span>разговорные клубы</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ КОНТАКТЫ ============ -->
+    <section class="section" id="contacts">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="section-num">04</span>
+          <div>
+            <h2>Контакты</h2>
+            <p class="section-lead">
+              Вопросы по обучению, переводу или сотрудничеству — пишите
+              удобным способом. Отвечаю в течение одного-двух дней.
+            </p>
+          </div>
+        </div>
+
+        <div class="contacts-layout">
+          <ul class="contact-list">
+            <li class="contact-card reveal">
+              <span class="contact-label">E-mail</span>
+              <a href="mailto:hello@podnebesnaya.ru">hello@podnebesnaya.ru</a>
+            </li>
+            <li class="contact-card reveal">
+              <span class="contact-label">Telegram</span>
+              <a href="https://t.me/podnebesnaya" target="_blank" rel="noopener">@podnebesnaya</a>
+            </li>
+            <li class="contact-card reveal">
+              <span class="contact-label">WeChat</span>
+              <span class="contact-value">podnebesnaya_cn</span>
+            </li>
+            <li class="contact-card reveal">
+              <span class="contact-label">Город</span>
+              <span class="contact-value">Москва · UTC+3</span>
+            </li>
+          </ul>
+
+          <form class="contact-form reveal" id="contactForm" novalidate>
+            <h3>Написать сообщение</h3>
+
+            <label class="field">
+              <span>Как вас зовут</span>
+              <input type="text" name="name" placeholder="Имя" required>
+            </label>
+
+            <label class="field">
+              <span>E-mail для ответа</span>
+              <input type="email" name="email" placeholder="you@example.com" required>
+            </label>
+
+            <label class="field">
+              <span>Сообщение</span>
+              <textarea name="message" rows="4" placeholder="Расскажите, с чем нужна помощь" required></textarea>
+            </label>
+
+            <button class="btn btn-primary" type="submit">Отправить</button>
+            <p class="form-note" id="formNote" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <div class="footer-brand">
+        <span class="brand-mark" aria-hidden="true">中</span>
+        <p>Поднебесная — заметки о Китае.<br><small>© <span id="year">2026</span> Анна Ли</small></p>
+      </div>
+
+      <nav class="footer-nav" aria-label="Навигация в подвале">
+        <a href="#about">О сайте</a>
+        <a href="#news">Новости</a>
+        <a href="#author">Об авторе</a>
+        <a href="#contacts">Контакты</a>
+        <a href="forum.html">Форум</a>
+      </nav>
+
+      <a class="footer-top" href="#top">Наверх ↑</a>
+    </div>
+  </footer>
+
+  <button class="to-top" id="toTop" type="button" aria-label="Наверх">↑</button>
+
+  <script src="main.js"></script>
+</body>
+</html>
