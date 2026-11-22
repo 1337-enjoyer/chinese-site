@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Админка — Поднебесная</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin-page">
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true">中</span>
+        <span class="brand-text">
+          Поднебесная
+          <small>управление новостями</small>
+        </span>
+      </a>
+
+      <nav class="nav" aria-label="Навигация админки">
+        <a href="index.html">На сайт</a>
+        <a href="index.html#news">Лента новостей</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="admin-main">
+    <div class="wrap">
+      <!-- ============ ВХОД ============ -->
+      <section class="admin-login" id="loginView" hidden>
+        <h1>Вход в админку</h1>
+        <p class="admin-hint">
+          Управление лентой новостей на главной странице. Пароль задаётся
+          переменной окружения <code>ADMIN_PASSWORD</code> при запуске сервера.
+        </p>
+
+        <form class="admin-card admin-form" id="loginForm" novalidate>
+          <label class="field">
+            <span>Пароль</span>
+            <input type="password" name="password" autocomplete="current-password" placeholder="Введите пароль" required>
+          </label>
+
+          <button class="btn btn-primary" type="submit">Войти</button>
+          <p class="form-note" id="loginNote" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <!-- ============ ПАНЕЛЬ ============ -->
+      <section class="admin-panel" id="panelView" hidden>
+        <div class="admin-head">
+          <div>
+            <p class="eyebrow">Админка</p>
+            <h1>Лента новостей</h1>
+            <p class="admin-hint">
+              Добавляйте и удаляйте записи. Они сохраняются в
+              <code>data/news.json</code> и сразу появляются на главной странице.
+            </p>
+          </div>
+
+          <div class="admin-actions">
+            <a class="btn btn-ghost btn-small" href="index.html#news" target="_blank" rel="noopener">Открыть сайт</a>
+            <button class="btn btn-ghost btn-small" type="button" id="logoutBtn">Выйти</button>
+          </div>
+        </div>
+
+        <div class="admin-grid">
+          <form class="admin-card admin-form" id="newsForm" novalidate>
+            <h2>Новая запись</h2>
+
+            <label class="field">
+              <span>Дата</span>
+              <input type="date" name="date" required>
+            </label>
+
+            <label class="field">
+              <span>Тег</span>
+              <input type="text" name="tag" maxlength="40" placeholder="Язык, культура, бизнес…" required>
+            </label>
+
+            <label class="field">
+              <span>Заголовок</span>
+              <input type="text" name="title" maxlength="160" placeholder="О чём заметка" required>
+            </label>
+
+            <label class="field">
+              <span>Текст</span>
+              <textarea name="text" rows="4" maxlength="600" placeholder="Короткое описание на 1–2 предложения" required></textarea>
+            </label>
+
+            <button class="btn btn-primary" type="submit">Добавить запись</button>
+            <p class="form-note" id="newsNote" role="status" aria-live="polite"></p>
+          </form>
+
+          <div class="admin-card admin-list-card">
+            <div class="admin-list-head">
+              <h2>Записи <span class="admin-count" id="newsCount">0</span></h2>
+              <button class="btn btn-ghost btn-small" type="button" id="reloadBtn">Обновить</button>
+            </div>
+
+            <ul class="admin-list" id="newsList"></ul>
+            <p class="admin-empty" id="newsEmpty" hidden>Пока нет ни одной записи. Добавьте первую через форму слева.</p>
+          </div>
+        </div>
+      </section>
+
+      <p class="admin-status" id="globalNote" role="status" aria-live="polite"></p>
+    </div>
+  </main>
+
+  <script src="admin.js" defer></script>
+</body>
+</html>

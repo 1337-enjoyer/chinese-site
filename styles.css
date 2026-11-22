@@ -690,6 +690,14 @@ ul {
   color: var(--muted);
 }
 
+.news-empty {
+  padding: 28px 30px;
+  border: 1px dashed var(--line);
+  border-radius: 16px;
+  font-size: 14px;
+  color: var(--muted-2);
+}
+
 /* ============================================================
    ОБ АВТОРЕ
    ============================================================ */

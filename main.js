@@ -149,4 +149,113 @@
       form.reset();
     });
   }
+
+  /* ---------- лента новостей из data/news.json ---------- */
+
+  const MONTHS = [
+    "января", "февраля", "марта", "апреля", "мая", "июня",
+    "июля", "августа", "сентября", "октября", "ноября", "декабря"
+  ];
+
+  function formatNewsDate(iso) {
+    const parts = String(iso || "").split("-").map(Number);
+
+    if (parts.length !== 3 || parts.some(function (value) { return Number.isNaN(value); })) {
+      return iso;
+    }
+
+    const month = MONTHS[parts[1] - 1];
+    if (!month) return iso;
+
+    return parts[2] + " " + month + " " + parts[0];
+  }
+
+  function renderNews(items) {
+    const feed = document.querySelector(".news-feed");
+    if (!feed) return;
+
+    const fragment = document.createDocumentFragment();
+
+    if (!items.length) {
+      const empty = document.createElement("p");
+      empty.className = "news-empty";
+      empty.textContent = "Пока новостей нет.";
+      fragment.appendChild(empty);
+    }
+
+    items.forEach(function (item) {
+      const card = document.createElement("article");
+      card.className = "news-card";
+
+      const meta = document.createElement("div");
+      meta.className = "news-meta";
+
+      const time = document.createElement("time");
+      time.dateTime = item.date;
+      time.textContent = formatNewsDate(item.date);
+
+      const tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = item.tag;
+
+      meta.append(time, tag);
+
+      const title = document.createElement("h3");
+      title.textContent = item.title;
+
+      const text = document.createElement("p");
+      text.textContent = item.text;
+
+      card.append(meta, title, text);
+      fragment.appendChild(card);
+    });
+
+    feed.replaceChildren(fragment);
+  }
+
+  const newsFeed = document.querySelector(".news-feed");
+
+  function loadNews() {
+    if (!newsFeed || typeof window.fetch !== "function") return;
+    if (location.protocol !== "http:" && location.protocol !== "https:") return;
+
+    return fetch("/api/news", {
+      headers: { Accept: "application/json" },
+      cache: "no-store"
+    })
+      .then(function (response) {
+        if (!response.ok) throw new Error("HTTP " + response.status);
+        return response.json();
+      })
+      .then(function (items) {
+        if (Array.isArray(items)) renderNews(items);
+      })
+      .catch(function () {
+        // сервер недоступен — остаются статические карточки из index.html
+      });
+  }
+
+  if (newsFeed) {
+    loadNews();
+
+    // Лента перезапрашивается при возврате на вкладку: записи, добавленные
+    // в админке, появляются без перезагрузки страницы.
+    let lastLoad = Date.now();
+
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) return;
+      if (Date.now() - lastLoad < 2000) return;
+
+      lastLoad = Date.now();
+      loadNews();
+    });
+
+    window.addEventListener("pageshow", function (event) {
+      // страница восстановлена из кеша браузера (кнопка «назад», bfcache)
+      if (event.persisted) {
+        lastLoad = Date.now();
+        loadNews();
+      }
+    });
+  }
 })();
