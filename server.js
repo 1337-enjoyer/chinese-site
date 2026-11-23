@@ -7,6 +7,7 @@
 "use strict";
 
 const http = require("http");
+const https = require("https");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
@@ -20,6 +21,20 @@ const SESSION_TTL = 4 * 60 * 60 * 1000; // 4 часа
 const LOGIN_WINDOW = 10 * 60 * 1000; // окно ограничения попыток
 const LOGIN_LIMIT = 8; // попыток за окно
 const MAX_BODY = 100 * 1024; // 100 КБ
+
+const FORUM_PATH = "/forum";
+const FORUM_URL = process.env.FORUM_URL || "http://127.0.0.1:4567";
+
+let forumTarget;
+try {
+  forumTarget = new URL(FORUM_URL);
+} catch (err) {
+  console.error("Некорректный FORUM_URL — использую http://127.0.0.1:4567");
+  forumTarget = new URL("http://127.0.0.1:4567");
+}
+
+const forumHttp = forumTarget.protocol === "https:" ? https : http;
+const forumPort = Number(forumTarget.port) || (forumTarget.protocol === "https:" ? 443 : 80);
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -413,6 +428,98 @@ async function handleApi(req, res, pathname) {
   throw new HttpError(404, "Неизвестный метод API");
 }
 
+/* ---------- прокси форума NodeBB ---------- */
+
+function forumHeaders(req) {
+  const forwardedFor = req.headers["x-forwarded-for"];
+
+  return Object.assign({}, req.headers, {
+    "x-forwarded-for": (forwardedFor ? forwardedFor + ", " : "") + getIp(req),
+    "x-forwarded-proto": req.socket.encrypted ? "https" : "http",
+    "x-forwarded-host": req.headers.host || ""
+  });
+}
+
+function proxyForum(req, res) {
+  const proxyReq = forumHttp.request(
+    {
+      protocol: forumTarget.protocol,
+      hostname: forumTarget.hostname,
+      port: forumPort,
+      method: req.method,
+      path: req.url,
+      headers: forumHeaders(req)
+    },
+    function (proxyRes) {
+      res.writeHead(proxyRes.statusCode || 502, proxyRes.headers);
+      proxyRes.pipe(res);
+    }
+  );
+
+  proxyReq.on("error", function () {
+    if (res.headersSent) {
+      res.destroy();
+      return;
+    }
+
+    sendText(res, 502, "Форум недоступен. Запустите его командой: docker compose up -d");
+  });
+
+  req.pipe(proxyReq);
+}
+
+function proxyForumUpgrade(req, socket, head) {
+  const proxyReq = forumHttp.request({
+    protocol: forumTarget.protocol,
+    hostname: forumTarget.hostname,
+    port: forumPort,
+    method: req.method,
+    path: req.url,
+    headers: forumHeaders(req)
+  });
+
+  proxyReq.on("upgrade", function (proxyRes, proxySocket, proxyHead) {
+    const lines = ["HTTP/1.1 101 Switching Protocols"];
+
+    for (let i = 0; i < proxyRes.rawHeaders.length; i += 2) {
+      lines.push(proxyRes.rawHeaders[i] + ": " + proxyRes.rawHeaders[i + 1]);
+    }
+
+    socket.write(lines.join("\r\n") + "\r\n\r\n");
+    if (proxyHead && proxyHead.length) socket.write(proxyHead);
+
+    proxySocket.on("error", function () {
+      socket.destroy();
+    });
+    socket.on("error", function () {
+      proxySocket.destroy();
+    });
+
+    proxySocket.pipe(socket);
+    socket.pipe(proxySocket);
+  });
+
+  proxyReq.on("response", function (proxyRes) {
+    socket.write("HTTP/1.1 " + proxyRes.statusCode + " " + (proxyRes.statusMessage || "") + "\r\n");
+
+    for (let i = 0; i < proxyRes.rawHeaders.length; i += 2) {
+      socket.write(proxyRes.rawHeaders[i] + ": " + proxyRes.rawHeaders[i + 1] + "\r\n");
+    }
+
+    socket.write("\r\n");
+    proxyRes.pipe(socket);
+  });
+
+  proxyReq.on("error", function () {
+    if (socket.writable) {
+      socket.end("HTTP/1.1 502 Bad Gateway\r\nConnection: close\r\n\r\n");
+    }
+  });
+
+  if (head && head.length) proxyReq.write(head);
+  proxyReq.end();
+}
+
 /* ---------- статика ---------- */
 
 function serveStatic(req, res, pathname) {
@@ -468,6 +575,17 @@ const server = http.createServer(function (req, res) {
     return;
   }
 
+  if (pathname === FORUM_PATH) {
+    res.writeHead(301, { Location: FORUM_PATH + "/" });
+    res.end();
+    return;
+  }
+
+  if (pathname.startsWith(FORUM_PATH + "/")) {
+    proxyForum(req, res);
+    return;
+  }
+
   const isApi = pathname === "/api" || pathname.startsWith("/api/");
 
   Promise.resolve(isApi ? handleApi(req, res, pathname) : serveStatic(req, res, pathname)).catch(
@@ -488,6 +606,24 @@ const server = http.createServer(function (req, res) {
   );
 });
 
+server.on("upgrade", function (req, socket, head) {
+  let pathname;
+
+  try {
+    pathname = decodeURIComponent(new URL(req.url, "http://localhost").pathname);
+  } catch (err) {
+    socket.destroy();
+    return;
+  }
+
+  if (pathname !== FORUM_PATH && !pathname.startsWith(FORUM_PATH + "/")) {
+    socket.destroy();
+    return;
+  }
+
+  proxyForumUpgrade(req, socket, head);
+});
+
 setInterval(function () {
   const now = Date.now();
 
@@ -505,6 +641,8 @@ server.listen(PORT, function () {
   console.log("  Поднебесная — сервер запущен");
   console.log("  Сайт:    http://localhost:" + PORT + "/");
   console.log("  Админка: http://localhost:" + PORT + "/admin.html");
+  console.log("  Форум:   http://localhost:" + PORT + "/forum/");
+  console.log("  NodeBB:  " + forumTarget.origin + " (прокси " + FORUM_PATH + "/)");
 
   if (process.env.ADMIN_PASSWORD) {
     console.log("  Пароль:  из переменной окружения ADMIN_PASSWORD");

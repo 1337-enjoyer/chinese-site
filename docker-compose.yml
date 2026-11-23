@@ -1,0 +1,95 @@
+# ============================================================
+#  Поднебесная — форум NodeBB + MongoDB
+#  Запуск: docker compose up -d
+#  Сайт при этом проксирует /forum/* на NodeBB (см. server.js).
+# ============================================================
+
+name: podnebesnaya-forum
+
+services:
+  # ---------- MongoDB ----------
+  mongo:
+    image: mongo:7
+    container_name: podnebesnaya-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "${MONGO_ROOT_USERNAME:-root}"
+      MONGO_INITDB_ROOT_PASSWORD: "${MONGO_ROOT_PASSWORD:-rootpass}"
+      MONGO_INITDB_DATABASE: "${NODEBB_DB_NAME:-nodebb}"
+      NODEBB_DB_NAME: "${NODEBB_DB_NAME:-nodebb}"
+      NODEBB_DB_USER: "${NODEBB_DB_USER:-nodebb}"
+      NODEBB_DB_PASSWORD: "${NODEBB_DB_PASSWORD:-nodebbpass}"
+    volumes:
+      - mongo-data:/data/db
+      - ./forum/mongo-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          mongosh --quiet --host 127.0.0.1
+          --username "$$NODEBB_DB_USER"
+          --password "$$NODEBB_DB_PASSWORD"
+          --authenticationDatabase "$$NODEBB_DB_NAME"
+          --eval "db.runCommand({ ping: 1 }).ok" >/dev/null
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
+    networks:
+      - forum
+
+  # ---------- NodeBB ----------
+  # Пока нет /opt/config/config.json, контейнер один раз выполняет
+  # неинтерактивную установку, затем запускает форум.
+  nodebb:
+    image: ghcr.io/nodebb/nodebb:latest
+    container_name: podnebesnaya-forum
+    restart: unless-stopped
+    entrypoint:
+      - /usr/local/bin/tini
+      - --
+      - /bin/bash
+      - -c
+      - |
+        set -e
+        if [ ! -f /opt/config/config.json ]; then
+          echo "NodeBB: первая установка, это может занять несколько минут..."
+          SETUP=1 /usr/local/bin/entrypoint.sh
+        fi
+        exec /usr/local/bin/entrypoint.sh
+    environment:
+      NODEBB_URL: "${FORUM_PUBLIC_URL:-http://localhost:8000/forum}"
+      NODEBB_PORT: "4567"
+      NODEBB_DB: mongo
+      NODEBB_DB_HOST: mongo
+      NODEBB_DB_PORT: "27017"
+      NODEBB_DB_NAME: "${NODEBB_DB_NAME:-nodebb}"
+      NODEBB_DB_USER: "${NODEBB_DB_USER:-nodebb}"
+      NODEBB_DB_PASSWORD: "${NODEBB_DB_PASSWORD:-nodebbpass}"
+      NODEBB_ADMIN_USERNAME: "${NODEBB_ADMIN_USERNAME:-admin}"
+      NODEBB_ADMIN_PASSWORD: "${NODEBB_ADMIN_PASSWORD:-Podnebesnaya-Forum-2026!}"
+      NODEBB_ADMIN_EMAIL: "${NODEBB_ADMIN_EMAIL:-admin@example.com}"
+    ports:
+      # Доступен напрямую только с этой машины; публичный вход — через сайт.
+      - "127.0.0.1:4567:4567"
+    volumes:
+      - nodebb-config:/opt/config
+      - nodebb-modules:/usr/src/app/node_modules
+      - nodebb-build:/usr/src/app/build
+      - nodebb-uploads:/usr/src/app/public/uploads
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - forum
+
+volumes:
+  mongo-data:
+  nodebb-config:
+  nodebb-modules:
+  nodebb-build:
+  nodebb-uploads:
+
+networks:
+  forum:
+    driver: bridge

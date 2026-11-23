@@ -4,172 +4,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=1280">
   <title>Форум — Поднебесная</title>
-  <meta name="description" content="Будущий форум сайта «Поднебесная»: обсуждения языка, культуры и деловой практики Китая.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <meta name="description" content="Форум сообщества «Поднебесная» на NodeBB: обсуждения языка, культуры и деловой практики Китая.">
+  <meta name="robots" content="noindex">
+  <meta http-equiv="refresh" content="0; url=/forum/">
+  <link rel="canonical" href="/forum/">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="forum-page">
-  <a class="skip-link" href="#main">Перейти к содержанию</a>
-
-  <header class="site-header" id="top">
-    <div class="wrap header-inner">
-      <a class="brand" href="index.html">
-        <span class="brand-mark" aria-hidden="true">中</span>
-        <span class="brand-text">
-          Поднебесная
-          <small>заметки о Китае</small>
-        </span>
-      </a>
-
-      <nav class="nav" aria-label="Основная навигация">
-        <a href="index.html#about">О сайте</a>
-        <a href="index.html#news">Новости</a>
-        <a href="index.html#author">Об авторе</a>
-        <a href="index.html#contacts">Контакты</a>
-        <a class="nav-forum is-active" href="forum.html">Форум <span class="soon">скоро</span></a>
-      </nav>
-    </div>
-  </header>
-
   <main id="main">
     <section class="forum-hero">
       <div class="wrap">
-        <span class="forum-badge">В разработке</span>
-        <h1>Форум сообщества</h1>
+        <span class="forum-badge">NodeBB</span>
+        <h1>Переходим на форум</h1>
         <p>
-          Место, где читатели смогут задавать вопросы, делиться опытом
-          и разбирать сложные случаи из практики. Пока идёт подготовка —
-          вот что появится здесь первым.
+          Форум сообщества работает на NodeBB. Если переход не начался
+          автоматически, откройте <a href="/forum/">/forum/</a>.
         </p>
-      </div>
-    </section>
-
-    <section class="forum-section">
-      <div class="wrap">
-        <h2>Планируемые разделы</h2>
-        <p class="section-lead">Структура повторяет логику сайта: язык, культура и прикладной опыт.</p>
-
-        <div class="forum-grid">
-          <article class="forum-topic reveal">
-            <span class="forum-topic-glyph" aria-hidden="true">语</span>
-            <h3>Китайский язык</h3>
-            <p>Тоны, иероглифика, грамматика, подготовка к HSK и разбор домашних заданий.</p>
-            <span class="topic-count">0 тем · скоро</span>
-          </article>
-
-          <article class="forum-topic reveal">
-            <span class="forum-topic-glyph" aria-hidden="true">文</span>
-            <h3>Культура и традиции</h3>
-            <p>Праздники, чай, каллиграфия, кино и книги — обсуждение без стереотипов.</p>
-            <span class="topic-count">0 тем · скоро</span>
-          </article>
-
-          <article class="forum-topic reveal">
-            <span class="forum-topic-glyph" aria-hidden="true">商</span>
-            <h3>Работа с Китаем</h3>
-            <p>Переговоры, WeChat, поставщики, логистика и деловой этикет.</p>
-            <span class="topic-count">0 тем · скоро</span>
-          </article>
-
-          <article class="forum-topic reveal">
-            <span class="forum-topic-glyph" aria-hidden="true">行</span>
-            <h3>Поездки</h3>
-            <p>Маршруты, визы, транспорт, жильё и личный опыт путешествий по Китаю.</p>
-            <span class="topic-count">0 тем · скоро</span>
-          </article>
-
-          <article class="forum-topic reveal">
-            <span class="forum-topic-glyph" aria-hidden="true">问</span>
-            <h3>Вопрос — ответ</h3>
-            <p>Короткие вопросы новичков и развёрнутые ответы опытных участников.</p>
-            <span class="topic-count">0 тем · скоро</span>
-          </article>
-
-          <article class="forum-topic reveal">
-            <span class="forum-topic-glyph" aria-hidden="true">茶</span>
-            <h3>Курилка</h3>
-            <p>Свободное общение, знакомства и разговорные клубы в Москве и онлайн.</p>
-            <span class="topic-count">0 тем · скоро</span>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="forum-section">
-      <div class="wrap">
-        <h2>Как форум будет подключён</h2>
-        <p class="section-lead">
-          Сайт статический, поэтому форум ставится отдельным движком —
-          на поддомене или в подпапке. Ниже — три шага, которые нужны,
-          чтобы запустить обсуждения.
-        </p>
-
-        <div class="forum-steps">
-          <article class="forum-step reveal">
-            <h3>Выбрать движок</h3>
-            <p>
-              Для сообщества достаточно <code>Flarum</code> или <code>NodeBB</code>.
-              Для большой аудитории — <code>Discourse</code>. Классический вариант —
-              <code>phpBB</code> на обычном хостинге с PHP.
-            </p>
-          </article>
-
-          <article class="forum-step reveal">
-            <h3>Разместить</h3>
-            <p>
-              Поднимите движок на <code>forum.podnebesnaya.ru</code> либо в папке
-              <code>/forum</code>. Настройте домен, SSL и базу данных —
-              дальше форум живёт независимо от сайта.
-            </p>
-          </article>
-
-          <article class="forum-step reveal">
-            <h3>Связать с сайтом</h3>
-            <p>
-              Замените ссылки <code>forum.html</code> в меню и подвале на адрес
-              форума. Стили шапки и подвала можно перенести в тему движка,
-              чтобы сохранить оформление.
-            </p>
-          </article>
-        </div>
-
-        <div class="forum-cta reveal">
-          <div>
-            <h2>Пока форум готовится</h2>
-            <p>
-              Вопросы, предложения по разделам и идеи тем можно присылать
-              напрямую — они войдут в первую волну обсуждений.
-            </p>
-          </div>
-          <a class="btn btn-primary" href="index.html#contacts">Написать автору</a>
-        </div>
       </div>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="wrap footer-inner">
-      <div class="footer-brand">
-        <span class="brand-mark" aria-hidden="true">中</span>
-        <p>Поднебесная — заметки о Китае.<br><small>© <span id="year">2026</span> Анна Ли</small></p>
-      </div>
-
-      <nav class="footer-nav" aria-label="Навигация в подвале">
-        <a href="index.html#about">О сайте</a>
-        <a href="index.html#news">Новости</a>
-        <a href="index.html#author">Об авторе</a>
-        <a href="index.html#contacts">Контакты</a>
-        <a href="forum.html">Форум</a>
-      </nav>
-
-      <a class="footer-top" href="#top">Наверх ↑</a>
-    </div>
-  </footer>
-
-  <button class="to-top" id="toTop" type="button" aria-label="Наверх">↑</button>
-
-  <script src="js/main.js"></script>
+  <script>
+    window.location.replace("/forum/");
+  </script>
 </body>
 </html>
