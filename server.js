@@ -1,6 +1,6 @@
 /* ============================================================
    Поднебесная — локальный сервер
-   Статика + API для ленты новостей + вход в админку.
+   Статика из public/ + API для ленты новостей + вход в админку.
    Без внешних зависимостей: node server.js
    ============================================================ */
 
@@ -12,6 +12,7 @@ const path = require("path");
 const crypto = require("crypto");
 
 const ROOT = __dirname;
+const PUBLIC_DIR = path.join(ROOT, "public");
 const DATA_FILE = path.join(ROOT, "data", "news.json");
 const PORT = Number(process.env.PORT) || 8000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
@@ -421,9 +422,9 @@ function serveStatic(req, res, pathname) {
   }
 
   const relative = pathname === "/" ? "index.html" : pathname.replace(/^\/+/, "");
-  const filePath = path.resolve(ROOT, relative);
+  const filePath = path.resolve(PUBLIC_DIR, relative);
 
-  if (filePath !== ROOT && !filePath.startsWith(ROOT + path.sep)) {
+  if (filePath !== PUBLIC_DIR && !filePath.startsWith(PUBLIC_DIR + path.sep)) {
     sendText(res, 403, "Доступ запрещён");
     return;
   }
