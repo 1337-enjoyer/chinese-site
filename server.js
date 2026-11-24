@@ -12,6 +12,24 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
+// --- Константы HTTP статусов (аналог http.HTTPStatus) ---
+const HTTP_STATUS = {
+  OK: 200,
+  CREATED: 201,
+  MOVED_PERMANENTLY: 301,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  METHOD_NOT_ALLOWED: 405,
+  REQUEST_TIMEOUT: 408,
+  PAYLOAD_TOO_LARGE: 413,
+  TOO_MANY_REQUESTS: 429,
+  INTERNAL_SERVER_ERROR: 500,
+  BAD_GATEWAY: 502,
+  SERVICE_UNAVAILABLE: 503
+};
+
 const ROOT = __dirname;
 const PUBLIC_DIR = path.join(ROOT, "public");
 const DATA_FILE = path.join(ROOT, "data", "news.json");
@@ -121,11 +139,11 @@ function readNews() {
   try {
     data = JSON.parse(raw);
   } catch (err) {
-    throw new HttpError(500, "Файл data/news.json повреждён");
+    throw new HttpError(HTTP_STATUS.INTERNAL_SERVER_ERROR, "Файл data/news.json повреждён");
   }
 
   if (!Array.isArray(data)) {
-    throw new HttpError(500, "Файл data/news.json должен содержать массив");
+    throw new HttpError(HTTP_STATUS.INTERNAL_SERVER_ERROR, "Файл data/news.json должен содержать массив");
   }
 
   return data
@@ -163,16 +181,16 @@ function validateNews(input) {
   const text = String(input.text || "").trim();
 
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(date))) {
-    throw new HttpError(400, "Укажите дату в формате ГГГГ-ММ-ДД");
+    throw new HttpError(HTTP_STATUS.BAD_REQUEST, "Укажите дату в формате ГГГГ-ММ-ДД");
   }
   if (tag.length < 2 || tag.length > 40) {
-    throw new HttpError(400, "Тег: от 2 до 40 символов");
+    throw new HttpError(HTTP_STATUS.BAD_REQUEST, "Тег: от 2 до 40 символов");
   }
   if (title.length < 5 || title.length > 160) {
-    throw new HttpError(400, "Заголовок: от 5 до 160 символов");
+    throw new HttpError(HTTP_STATUS.BAD_REQUEST, "Заголовок: от 5 до 160 символов");
   }
   if (text.length < 10 || text.length > 600) {
-    throw new HttpError(400, "Текст: от 10 до 600 символов");
+    throw new HttpError(HTTP_STATUS.BAD_REQUEST, "Текст: от 10 до 600 символов");
   }
 
   return { date: date, tag: tag, title: title, text: text };
@@ -267,11 +285,11 @@ function checkOrigin(req) {
   try {
     host = new URL(origin).host;
   } catch (err) {
-    throw new HttpError(403, "Некорректный заголовок Origin");
+    throw new HttpError(HTTP_STATUS.FORBIDDEN, "Некорректный заголовок Origin");
   }
 
   if (host !== req.headers.host) {
-    throw new HttpError(403, "Запрос с чужого домена отклонён");
+    throw new HttpError(HTTP_STATUS.FORBIDDEN, "Запрос с чужого домена отклонён");
   }
 }
 
@@ -289,7 +307,7 @@ function readJsonBody(req) {
       size += chunk.length;
       if (size > MAX_BODY) {
         settled = true;
-        reject(new HttpError(413, "Слишком большой запрос"));
+        reject(new HttpError(HTTP_STATUS.PAYLOAD_TOO_LARGE, "Слишком большой запрос"));
         return;
       }
 
@@ -305,11 +323,11 @@ function readJsonBody(req) {
       try {
         const parsed = JSON.parse(Buffer.concat(chunks).toString("utf8"));
         if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-          return reject(new HttpError(400, "Ожидается JSON-объект"));
+          return reject(new HttpError(HTTP_STATUS.BAD_REQUEST, "Ожидается JSON-объект"));
         }
         resolve(parsed);
       } catch (err) {
-        reject(new HttpError(400, "Некорректный JSON"));
+        reject(new HttpError(HTTP_STATUS.BAD_REQUEST, "Некорректный JSON"));
       }
     });
 
@@ -327,13 +345,13 @@ async function handleApi(req, res, pathname) {
   const method = req.method || "GET";
 
   if (pathname === "/api/news" && method === "GET") {
-    sendJson(res, 200, sortNews(readNews()));
+    sendJson(res, HTTP_STATUS.OK, sortNews(readNews()));
     return;
   }
 
   if (pathname === "/api/news" && method === "POST") {
     checkOrigin(req);
-    if (!getSessionToken(req)) throw new HttpError(401, "Требуется вход в админку");
+    if (!getSessionToken(req)) throw new HttpError(HTTP_STATUS.UNAUTHORIZED, "Требуется вход в админку");
 
     const body = await readJsonBody(req);
     const item = validateNews(body);
@@ -343,14 +361,14 @@ async function handleApi(req, res, pathname) {
     news.push(created);
     saveNews(sortNews(news));
 
-    sendJson(res, 201, created);
+    sendJson(res, HTTP_STATUS.CREATED, created);
     return;
   }
 
   const deleteMatch = pathname.match(/^\/api\/news\/([^/]+)$/);
   if (deleteMatch && method === "DELETE") {
     checkOrigin(req);
-    if (!getSessionToken(req)) throw new HttpError(401, "Требуется вход в админку");
+    if (!getSessionToken(req)) throw new HttpError(HTTP_STATUS.UNAUTHORIZED, "Требуется вход в админку");
 
     const id = decodeURIComponent(deleteMatch[1]);
     const news = readNews();
@@ -358,12 +376,12 @@ async function handleApi(req, res, pathname) {
       return item.id === id;
     });
 
-    if (index === -1) throw new HttpError(404, "Запись не найдена");
+    if (index === -1) throw new HttpError(HTTP_STATUS.NOT_FOUND, "Запись не найдена");
 
     const removed = news.splice(index, 1)[0];
     saveNews(news);
 
-    sendJson(res, 200, { ok: true, removed: removed });
+    sendJson(res, HTTP_STATUS.OK, { ok: true, removed: removed });
     return;
   }
 
@@ -372,7 +390,7 @@ async function handleApi(req, res, pathname) {
 
     const ip = getIp(req);
     if (isBlocked(ip)) {
-      throw new HttpError(429, "Слишком много попыток входа. Повторите через 10 минут");
+      throw new HttpError(HTTP_STATUS.TOO_MANY_REQUESTS, "Слишком много попыток входа. Повторите через 10 минут");
     }
 
     const body = await readJsonBody(req);
@@ -380,7 +398,7 @@ async function handleApi(req, res, pathname) {
 
     if (!safeEqual(password, ADMIN_PASSWORD)) {
       registerFailure(ip);
-      throw new HttpError(401, "Неверный пароль");
+      throw new HttpError(HTTP_STATUS.UNAUTHORIZED, "Неверный пароль");
     }
 
     loginAttempts.delete(ip);
@@ -390,7 +408,7 @@ async function handleApi(req, res, pathname) {
 
     sendJson(
       res,
-      200,
+      HTTP_STATUS.OK,
       { ok: true },
       {
         "Set-Cookie":
@@ -411,7 +429,7 @@ async function handleApi(req, res, pathname) {
 
     sendJson(
       res,
-      200,
+      HTTP_STATUS.OK,
       { ok: true },
       {
         "Set-Cookie": "admin_session=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0"
@@ -421,11 +439,11 @@ async function handleApi(req, res, pathname) {
   }
 
   if (pathname === "/api/session" && method === "GET") {
-    sendJson(res, 200, { authorized: Boolean(getSessionToken(req)) });
+    sendJson(res, HTTP_STATUS.OK, { authorized: Boolean(getSessionToken(req)) });
     return;
   }
 
-  throw new HttpError(404, "Неизвестный метод API");
+  throw new HttpError(HTTP_STATUS.NOT_FOUND, "Неизвестный метод API");
 }
 
 /* ---------- прокси форума NodeBB ---------- */
@@ -451,7 +469,7 @@ function proxyForum(req, res) {
       headers: forumHeaders(req)
     },
     function (proxyRes) {
-      res.writeHead(proxyRes.statusCode || 502, proxyRes.headers);
+      res.writeHead(proxyRes.statusCode || HTTP_STATUS.BAD_GATEWAY, proxyRes.headers);
       proxyRes.pipe(res);
     }
   );
@@ -462,7 +480,7 @@ function proxyForum(req, res) {
       return;
     }
 
-    sendText(res, 502, "Форум недоступен. Запустите его командой: docker compose up -d");
+    sendText(res, HTTP_STATUS.BAD_GATEWAY, "Форум недоступен. Запустите его командой: docker compose up -d");
   });
 
   req.pipe(proxyReq);
@@ -524,7 +542,7 @@ function proxyForumUpgrade(req, socket, head) {
 
 function serveStatic(req, res, pathname) {
   if (req.method !== "GET" && req.method !== "HEAD") {
-    sendText(res, 405, "Метод не поддерживается", { Allow: "GET, HEAD" });
+    sendText(res, HTTP_STATUS.METHOD_NOT_ALLOWED, "Метод не поддерживается", { Allow: "GET, HEAD" });
     return;
   }
 
@@ -532,19 +550,19 @@ function serveStatic(req, res, pathname) {
   const filePath = path.resolve(PUBLIC_DIR, relative);
 
   if (filePath !== PUBLIC_DIR && !filePath.startsWith(PUBLIC_DIR + path.sep)) {
-    sendText(res, 403, "Доступ запрещён");
+    sendText(res, HTTP_STATUS.FORBIDDEN, "Доступ запрещён");
     return;
   }
 
   fs.stat(filePath, function (err, stat) {
     if (err || !stat.isFile()) {
-      sendText(res, 404, "Страница не найдена");
+      sendText(res, HTTP_STATUS.NOT_FOUND, "Страница не найдена");
       return;
     }
 
     const type = MIME[path.extname(filePath).toLowerCase()] || "application/octet-stream";
 
-    res.writeHead(200, {
+    res.writeHead(HTTP_STATUS.OK, {
       "Content-Type": type,
       "Content-Length": stat.size,
       "Cache-Control": "no-cache"
@@ -571,12 +589,12 @@ const server = http.createServer(function (req, res) {
   try {
     pathname = decodeURIComponent(new URL(req.url, "http://localhost").pathname);
   } catch (err) {
-    sendText(res, 400, "Некорректный адрес");
+    sendText(res, HTTP_STATUS.BAD_REQUEST, "Некорректный адрес");
     return;
   }
 
   if (pathname === FORUM_PATH) {
-    res.writeHead(301, { Location: FORUM_PATH + "/" });
+    res.writeHead(HTTP_STATUS.MOVED_PERMANENTLY, { Location: FORUM_PATH + "/" });
     res.end();
     return;
   }
@@ -590,9 +608,9 @@ const server = http.createServer(function (req, res) {
 
   Promise.resolve(isApi ? handleApi(req, res, pathname) : serveStatic(req, res, pathname)).catch(
     function (err) {
-      const status = err instanceof HttpError ? err.status : 500;
+      const status = err instanceof HttpError ? err.status : HTTP_STATUS.INTERNAL_SERVER_ERROR;
 
-      if (status === 500) console.error(err);
+      if (status === HTTP_STATUS.INTERNAL_SERVER_ERROR) console.error(err);
 
       if (res.headersSent) {
         res.destroy();
